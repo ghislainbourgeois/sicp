@@ -251,3 +251,34 @@
 ;; 2n
 ;; 2^n
 ;; 2^2^... (n-1 times)
+
+
+;; Exercise 1.11
+;;
+;; f(n) = n   if n < 3
+;; f(n) = f(n-1) + 2f(n-2) + 3f(n-3) if n >=3
+;;
+;; recursive
+
+(define (f n)
+  (cond ((< n 3) n)
+	(else (+ (f (- n 1)) (* 2 (f (- n 2))) (* 3 (f (- n 3)))))))
+
+;; iterative
+
+(define (f n)
+  (define (f-iter x a b c)
+    (cond ((> x n) a)
+	  ((< x 3) (f-iter (+ x 1) x a b))
+	  (else (f-iter (+ x 1) (+ a (* 2 b) (* 3 c)) a b))))
+  (f-iter 1 0 0 0))
+
+
+;; Exercise 1.12
+
+(define (pascal row col)
+  (cond ((> col row) 0)
+	((= row 1) 1)
+	((= col 1) 1)
+	((= col row) 1)
+	(else (+ (pascal (- row 1) (- col 1)) (pascal (- row 1) col)))))
