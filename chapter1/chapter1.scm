@@ -282,3 +282,58 @@
 	((= col 1) 1)
 	((= col row) 1)
 	(else (+ (pascal (- row 1) (- col 1)) (pascal (- row 1) col)))))
+
+
+;; Exercise 1.16
+
+(define (even? n)
+  (= (remainder n 2) 0))
+
+(define (exp b n)
+  (define (exp-iter a b n)
+    (cond ((= n 0) a)
+	  ((even? n) (exp-iter a (square b) (/ n 2)))
+	  (else (exp-iter (* a b) b (- n 1)))))
+  (exp-iter 1 b n))
+
+
+;; Exercise 1.17
+
+(define (double x)
+  (+ x x))
+(define (halve x)
+  (/ x 2))
+
+(define (my* a b)
+  (cond ((= b 0) 0)
+        ((even? b) (my* (double a) (halve b)))
+	(else (+ a (my* a (- b 1))))))
+
+
+;; Exercise 1.18
+
+(define (multiply a b)
+  (define (iter a b sum)
+    (cond ((= b 0) sum)
+	  ((even? b) (iter (double a) (halve b) sum))
+	  (else (iter a (- b 1) (+ sum a)))))
+  (iter a b 0))
+
+
+;; Exercise 1.19
+
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ (square p) (square q))
+		   (+ (* 2 p q) (square q))
+                   (/ count 2)))
+         (else (fib-iter (+ (* b q) (* a q) (* a p))
+                         (+ (* b p) (* a q))
+                         p
+                         q
+                         (- count 1)))))
