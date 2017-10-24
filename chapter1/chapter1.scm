@@ -399,3 +399,289 @@
 ;; (if (= 0 0) 2 (gcd 0 (remainder 2 0)))
 ;; (if #t 2 (gcd 0 (remainder 2 0)))
 ;; 2
+
+
+;; Exercise 1.21
+;;
+
+(define (smallest-divisor n) (find-divisor n 2))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+	((divides? test-divisor n) test-divisor)
+	(else (find-divisor n (+ test-divisor 1)))))
+(define (divides? a b) (= (remainder b a) 0))
+
+(smallest-divisor 199)
+199
+
+(smallest-divisor 1999)
+1999
+
+(smallest-divisor 19999)
+7
+
+
+;; Exercise 1.22
+;;
+
+(define (prime? n)
+  (= n (smallest-divisor n)))
+(define (timed-primed-test n)
+  ;;(newline)
+  ;;(display n)
+  (start-prime-test n (runtime)))
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime n (- (runtime) start-time))))
+(define (report-prime n elapsed-time)
+  (display n)
+  (display " *** ")
+  (display elapsed-time)
+  (newline))
+
+(define (search-for-primes a b)
+  (cond ((> a b) 0)
+	((even? a) (search-for-primes (+ a 1) b))
+	(else (timed-primed-test a) (search-for-primes (+ a 2) b))))
+
+(newline)
+(display "(search-for-primes 1000000000 1000000021)")
+(newline)
+(search-for-primes 1000000000 1000000021)
+(display "(search-for-primes 10000000000 10000000061)")
+(newline)
+(search-for-primes 10000000000 10000000061)
+(display "(search-for-primes 100000000000 100000000057)")
+(newline)
+(search-for-primes 100000000000 100000000057)
+(display "(search-for-primes 1000000000000 1000000000063)")
+(newline)
+(search-for-primes 1000000000000 1000000000063)
+
+;; (search-for-primes 1000000000 1000000021)
+;; 1000000007 *** 3.0000000000001137e-2
+;; 1000000009 *** 3.0000000000001137e-2
+;; 1000000021 *** 3.0000000000001137e-2
+;;
+;; (search-for-primes 10000000000 10000000061)
+;; 10000000019 *** .08999999999999986
+;; 10000000033 *** .09999999999999787
+;; 10000000061 *** .10000000000000142
+;;
+;; (search-for-primes 100000000000 100000000057)
+;; 100000000003 *** .3200000000000003
+;; 100000000019 *** .3000000000000007
+;; 100000000057 *** .3100000000000023
+;;
+;; (search-for-primes 1000000000000 1000000000063)
+;; 1000000000039 *** .9800000000000004
+;; 1000000000061 *** .990000000000002
+;; 1000000000063 *** .9800000000000004
+;;
+;; We can see that that the time needed increases around 3x, or approximately
+;; the square root of 10. This confirm the expected growth and that the
+;; computer time increases proportionnaly to the number of steps.
+
+
+;; Exercise 1.23
+
+(define (next test-divisor)
+  (if (= test-divisor 2)
+      3
+      (+ test-divisor 2)))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+	((divides? test-divisor n) test-divisor)
+	(else (find-divisor n (next test-divisor)))))
+
+(newline)
+(display "(search-for-primes 1000000000 1000000021)")
+(newline)
+(search-for-primes 1000000000 1000000021)
+(display "(search-for-primes 10000000000 10000000061)")
+(newline)
+(search-for-primes 10000000000 10000000061)
+(display "(search-for-primes 100000000000 100000000057)")
+(newline)
+(search-for-primes 100000000000 100000000057)
+(display "(search-for-primes 1000000000000 1000000000063)")
+(newline)
+(search-for-primes 1000000000000 1000000000063)
+
+;; (search-for-primes 1000000000 1000000021)
+;; 1000000007 *** .01999999999999602
+;; 1000000009 *** 2.0000000000003126e-2
+;; 1000000021 *** .00999999999999801
+;; (search-for-primes 10000000000 10000000061)
+;; 10000000019 *** .05999999999999517
+;; 10000000033 *** 6.0000000000002274e-2
+;; 10000000061 *** .07000000000000028
+;; (search-for-primes 100000000000 100000000057)
+;; 100000000003 *** .17999999999999972
+;; 100000000019 *** .20000000000000284
+;; 100000000057 *** .18999999999999773
+;; (search-for-primes 1000000000000 1000000000063)
+;; 1000000000039 *** .6099999999999994
+;; 1000000000061 *** .6000000000000014
+;; 1000000000063 *** .6099999999999994
+;;
+;; We can observe that this version is about 1.5 times faster. This
+;; can be explained by the added if condition that happens at
+;; each step and that was not there before.
+
+
+;; Exercise 1.24
+;;
+;; Taking the logarithms of 1,000,000,000 and 1,000,000,000,000,
+;; we obtain 9 and 12 respectively. We would expect the time needed
+;; for the largest primes to be about 1.3 times longer than for the
+;; smaller primes.
+
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+	((even? exp)
+	 (remainder
+	  (square (expmod base (/ exp 2) m))
+	  m))
+	(else
+	 (remainder
+	  (* base (expmod base (- exp 1) m))
+	  m))))
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+	((fermat-test n) (fast-prime? n (- times 1)))
+	(else false)))
+
+(define (start-prime-test n start-time)
+  (if (fast-prime? n 10000)
+      (report-prime n (- (runtime) start-time))))
+
+(newline)
+(display "(search-for-primes 1000000000 1000000021)")
+(newline)
+(search-for-primes 1000000000 1000000021)
+(display "(search-for-primes 10000000000 10000000061)")
+(newline)
+(search-for-primes 10000000000 10000000061)
+(display "(search-for-primes 100000000000 100000000057)")
+(newline)
+(search-for-primes 100000000000 100000000057)
+(display "(search-for-primes 1000000000000 1000000000063)")
+(newline)
+(search-for-primes 1000000000000 1000000000063)
+
+;; (search-for-primes 1000000000 1000000021)
+;; 1000000007 *** .6199999999999903
+;; 1000000009 *** .6099999999999994
+;; 1000000021 *** .6099999999999994
+;; (search-for-primes 10000000000 10000000061)
+;; 10000000019 *** .7000000000000028
+;; 10000000033 *** .6899999999999977
+;; 10000000061 *** .730000000000004
+;; (search-for-primes 100000000000 100000000057)
+;; 100000000003 *** .7900000000000063
+;; 100000000019 *** .7999999999999972
+;; 100000000057 *** .8100000000000023
+;; (search-for-primes 1000000000000 1000000000063)
+;; 1000000000039 *** .8400000000000034
+;; 1000000000061 *** .8400000000000034
+;; 1000000000063 *** .8499999999999943
+;;
+;; From those results, we can confirm the expected increase of
+;; around 1.3 times. (.84 / 1.3 = .64)
+
+
+;; Exercise 1.25
+;;
+(define (fast-expt b n)
+  (cond ((= n 0) 1)
+	((even? n) (square (fast-expt b (/ n 2))))
+	(else (* b (fast-expt b (- n 1))))))
+
+(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))
+
+;; She is not correct. This version needs to calculate the remainder on
+;; really large numbers. This takes a lot more time than the more complex
+;; version.
+
+
+;; Exercise 1.26
+;;
+;; By using an explicit multiplication instead of the square function,
+;; the expmod function will be evaluated twice with the same parameters
+;; before doing the multiplication.
+
+
+;; Exercise 1.27
+;;
+
+(define (carmichael? n)
+  (define (try-it? a)
+    (= (expmod a n n) a))
+  (define (iter a)
+    (cond ((= a n) true)
+	  ((try-it? a) (iter (+ a 1)))
+	  (else false)))
+  (iter 1))
+
+(display (carmichael? 561)) ;; #t
+(newline)
+(display (carmichael? 1105)) ;; #t
+(newline)
+(display (carmichael? 1729)) ;; #t
+(newline)
+(display (carmichael? 2465)) ;; #t
+(newline)
+(display (carmichael? 2821)) ;; #t
+(newline)
+(display (carmichael? 6601)) ;; #t
+(newline)
+
+
+;; Exercise 1.28
+;;
+
+
+(define (expmod base exp m)
+  (define (square-mod-and-check a)
+    (define (non-trivial-sqrt1 a square)
+      (if (and (= square 1)
+	       (not (= a 1))
+	       (not (= a (- m 1))))
+	  0
+	  square))
+    (non-trivial-sqrt1 a (remainder (square a) m)))
+  (cond ((= exp 0) 1)
+	((even? exp)
+	 (square-mod-and-check (expmod base (/ exp 2) m)))
+	(else
+	 (remainder
+	  (* base (expmod base (- exp 1) m))
+	  m))))
+
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a (- n 1) n) 1))
+  (try-it (+ 1 (random (- n 1)))))
+
+(display "7 is prime ")
+(display (fast-prime? 7 5))
+(newline)
+(display "53 is prime ")
+(display (fast-prime? 53 5))
+(newline)
+(display "561 is prime ")
+(display (fast-prime? 561 5))
+(newline)
+(display "1000000007 is prime ")
+(display (fast-prime? 1000000007 5))
+(newline)
