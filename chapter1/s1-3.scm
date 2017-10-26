@@ -135,3 +135,12 @@
   (define (relative-prime? x)
     (= 1 (gcd x n)))
   (filtered-accumulate relative-prime? * 1 identity 1 inc n))
+
+
+;; Exercise 1.34
+;;
+;; The interpreter stops with an error when trying to apply
+;; 2 as a procedure. The evaluation will go like this:
+;; (f f)
+;; (f 2)
+;; (2 2) -> this results in an error because 2 is not a procedure
