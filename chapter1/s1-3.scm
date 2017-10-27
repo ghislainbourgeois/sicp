@@ -226,6 +226,9 @@
 ;;
 ;; 33 steps
 
+(define (average x y)
+  (/ (+ x y) 2))
+
 (define (func x)
   (average x
 	   (/ (log 1000)
@@ -345,3 +348,67 @@
 	     k))
 
 (tan-cf 1.0 10)
+
+
+;; Exercise 1.40
+
+(define (deriv g)
+  (lambda (x) (/ (- (g (+ x dx)) (g x)) dx)))
+
+(define dx 0.00001)
+
+(define (newton-transform g)
+  (lambda (x) (- x (/ (g x) ((deriv g) x)))))
+(define (newtons-method g guess)
+  (fixed-point (newton-transform g) guess))
+
+(define (cubic a b c)
+  (newton-transform (lambda (x)
+		      (+ (cube x)
+			 (* a (square x))
+			 (* b x)
+			 c))))
+
+(newtons-method (cubic 3 4 0) 1)
+
+
+;; Exercise 1.41
+
+(define (double f)
+  (lambda (x) (f (f x))))
+
+(((double (double double)) inc) 5)
+
+;; 21
+
+
+;; Exercise 1.42
+
+(define (compose f g)
+  (lambda (x) (f (g x))))
+
+((compose square inc) 6)
+
+
+;; Exercise 1.43
+
+(define (repeated f n)
+  (define (iter g n)
+    (if (= n 1)
+	g
+	(iter (compose f g) (- n 1))))
+  (iter f n))
+
+((repeated square 2) 5)
+
+
+;; Exercise 1.44
+
+(define (smooth f)
+  (lambda (x) (/ (+ (f (- x dx))
+		    (f x)
+		    (f (+ x dx)))
+		 3)))
+
+(define (n-fold-smoothed f n)
+  ((repeated smooth n) f))
