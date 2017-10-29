@@ -412,3 +412,69 @@
 
 (define (n-fold-smoothed f n)
   ((repeated smooth n) f))
+
+
+;; Exercise 1.45
+
+(newline)
+(display "Exercise 1.45")
+(newline)
+
+(define (average-damp f)
+  (lambda (x) (average x (f x))))
+
+(define (log2 x)
+  (/ (log x)
+     (log 2)))
+
+(define (nth-root x n)
+  (define (f y)
+    (/ x (expt y (- n 1))))
+  (fixed-point ((repeated average-damp (floor (log2 n))) f) 2.0))
+
+(nth-root 25 2)  ;; 5 ^ 2 = 25
+(nth-root 81 4)  ;; 3 ^ 4 = 81
+(nth-root 243 5) ;; 3 ^ 5 = 243
+(nth-root 729 6) ;; 3 ^ 6 = 729
+(nth-root 14348907 15) ;; 3 ^ 15 = 14348907
+(nth-root 3486784401 20) ;; 3 ^ 20 = 3486784401
+
+
+;; Exercise 1.46
+
+(newline)
+(display "Exercise 1.46")
+(newline)
+
+(define (iterative-improve good-enough? improve)
+  (lambda (first-guess)
+    (define (try guess)
+       (newline)
+       (display guess)
+       (let ((next (improve guess)))
+	 (if (good-enough? guess)
+	     next
+	     (try next))))
+    (try first-guess)))
+
+(define (close-enough? v1 v2) (< (abs (- v1 v2)) tolerance))
+
+(define (fixed-point-iterative-improve f first-guess)
+  ((iterative-improve (lambda (v1) (< (abs (- v1 (f v1))) tolerance)) f)
+   first-guess))
+
+(newline)
+(display "fixed-point iterative-improve version: ")
+(fixed-point-iterative-improve func 2.0)
+
+(define (sqrt-iterative-improve x)
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess)
+    (average guess (/ x guess)))
+
+  ((iterative-improve good-enough? improve) 1.0))
+
+(newline)
+(display "sqrt iterative-improve version: ")
+(sqrt-iterative-improve 25.0)
