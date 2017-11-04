@@ -103,3 +103,68 @@
 (newline)
 (display "Area of rectangle B: ")
 (display (area rectB))
+
+
+;; Exercise 2.4
+
+;(define (cdr z)
+;  (z (lambda (p q) q)))
+
+;; (define pair (cons 1 2))
+;; (define pair (lambda (m) (m 1 2)))
+;; (define (pair m) (m 1 2))
+;; (cdr pair)
+;; (pair (lambda (p q) q))
+;; ((lambda (p q) q) 1 2)
+;; 2
+
+
+;; Exercise 2.5
+
+(define (cons2.5 a b)
+  (* (expt 2 a) (expt 3 b)))
+
+(define (find-expt-iter x div count)
+  (if (= 0 (remainder x div))
+      (find-expt-iter (/ x div) div (+ 1 count))
+      count))
+
+(define (car2.5 z)
+  (find-expt-iter z 2 0))
+
+(define (cdr2.5 z)
+  (find-expt-iter z 3 0))
+
+
+;; Exercise 2.6
+
+(define zero (lambda (f) (lambda (x) x)))
+(define (add-1 n)
+  (lambda (f) (lambda (x) (f ((n f) x)))))
+
+(define one (lambda (f) (lambda (x) (f x))))
+(define two (lambda (f) (lambda (x) (f (f x)))))
+
+(define (inc x) (+ 1 x))
+(newline)
+(display ((one inc) 0))
+(newline)
+(display (((add-1 zero) inc) 0))
+(newline)
+(display ((two inc) 0))
+(newline)
+(display (((add-1 (add-1 zero)) inc) 0))
+
+(define (church+ a b)
+  (lambda (f) (lambda (x)
+		((a f) ((b f) x)))))
+
+(newline)
+(newline)
+(display (((church+ two two) inc) 0))
+(newline)
+(display (((church+ two one) inc) 0))
+(newline)
+(display (((church+ two zero) inc) 0))
+(newline)
+(display (((church+ two (add-1 (add-1 (add-1 two)))) inc) 0))
