@@ -3,9 +3,9 @@
 (define (make-rat n d)
   (let ((g (gcd n d)))
     (if (< (/ n d) 0)
-	(cons (/ (- (abs n)) g) (/ (abs d) g))
-	(cons (/ (abs n) g) (/ (abs d) g)))))
-    
+      (cons (/ (- (abs n)) g) (/ (abs d) g))
+      (cons (/ (abs n) g) (/ (abs d) g)))))
+
 
 ;; Exercise 2.2
 
@@ -50,7 +50,7 @@
 (print-point point-a)
 (print-point point-b)
 (print-point (midpoint-segment segment))
-   
+
 
 ;; Exercise 2.3
 
@@ -81,20 +81,20 @@
 
 (define (make-rectangle origin height width)
   (cons (make-segment origin
-		      (make-point (+ (x-point origin) width)
-				  (y-point origin)))
-	(make-segment (make-point (x-point origin)
-				  (+ (y-point origin) height))
-		      (make-point (+ (x-point origin) width)
-				  (+ (y-point origin) height)))))
+                      (make-point (+ (x-point origin) width)
+                                  (y-point origin)))
+        (make-segment (make-point (x-point origin)
+                                  (+ (y-point origin) height))
+                      (make-point (+ (x-point origin) width)
+                                  (+ (y-point origin) height)))))
 
 (define (rect-height rect)
   (abs (- (y-point (start-segment (cdr rect)))
-	  (y-point (start-segment (car rect))))))
+          (y-point (start-segment (car rect))))))
 
 (define (rect-width rect)
   (abs (- (x-point (start-segment (car rect)))
-	  (x-point (end-segment (car rect))))))
+          (x-point (end-segment (car rect))))))
 
 (define rectB (make-rectangle (make-point 0 0) 10 5))
 (newline)
@@ -157,7 +157,7 @@
 
 (define (church+ a b)
   (lambda (f) (lambda (x)
-		((a f) ((b f) x)))))
+                ((a f) ((b f) x)))))
 
 (newline)
 (newline)
@@ -189,12 +189,43 @@
 
 (define (add-interval x y)
   (make-interval (+ (lower-bound x) (lower-bound y))
-		 (+ (upper-bound x) (upper-bound y))))
+                 (+ (upper-bound x) (upper-bound y))))
 
 (define (sub-interval x y)
   (add-interval
    x
    (make-interval (- (lower-bound y))
-		  (- (upper-bound y)))))
+                  (- (upper-bound y)))))
 
 (sub-interval (make-interval 1 2) (make-interval 2 3))
+
+
+;; Exercise 2.9
+;;
+
+(define (mul-interval x y)
+  (let ((p1 (* (lower-bound x) (lower-bound y)))
+        (p2 (* (lower-bound x) (upper-bound y)))
+        (p3 (* (upper-bound x) (lower-bound y)))
+        (p4 (* (upper-bound x) (upper-bound y))))
+    (make-interval (min p1 p2 p3 p4)
+                   (max p1 p2 p3 p4))))
+
+(define (div-interval x y)
+  (mul-interval
+    x
+    (make-interval (/ 1.0 (upper-bound y))
+                   (/ 1.0 (lower-bound y)))))
+
+(define (width int) (/ (- (upper-bound int) (lower-bound int)) 2))
+
+(define int1 (make-interval -100 200))
+(define int2 (make-interval 2 3))
+(define int_prod (mul-interval int1 int2))
+
+(newline)
+(display (width int1))
+(newline)
+(display (width int2))
+(newline)
+(display (width int_prod))
