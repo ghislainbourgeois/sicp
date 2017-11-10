@@ -168,3 +168,33 @@
 (display (((church+ two zero) inc) 0))
 (newline)
 (display (((church+ two (add-1 (add-1 (add-1 two)))) inc) 0))
+
+
+;; Exercise 2.7
+
+(define (make-interval a b) (cons a b))
+
+(define (upper-bound x)
+  (if (> (car x) (cdr x))
+      (car x)
+      (cdr x)))
+
+(define (lower-bound x)
+  (if (< (car x) (cdr x))
+      (car x)
+      (cdr x)))
+
+
+;; Exercise 2.8
+
+(define (add-interval x y)
+  (make-interval (+ (lower-bound x) (lower-bound y))
+		 (+ (upper-bound x) (upper-bound y))))
+
+(define (sub-interval x y)
+  (add-interval
+   x
+   (make-interval (- (lower-bound y))
+		  (- (upper-bound y)))))
+
+(sub-interval (make-interval 1 2) (make-interval 2 3))
