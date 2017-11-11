@@ -270,3 +270,22 @@
                   (make-interval (* lx uy) (* lx ly)))
                  ((and (neg? ly) (neg? uy))
                   (make-interval (* ux uy) (* lx ly))))))))
+
+
+;; Exercise 2.12
+
+(define (make-center-width c w)
+  (make-interval (- c w) (+ c w)))
+
+(define (center i)
+  (/ (+ (lower-bound i) (upper-bound i)) 2))
+
+(define (width i)
+  (/ (- (upper-bound i) (lower-bound i)) 2))
+
+(define (make-center-percent center percent)
+  (let ((w (* center percent)))
+    (make-center-width center w)))
+
+(define (percent i)
+  (/ (width i) (center i)))
