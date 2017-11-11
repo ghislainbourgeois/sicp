@@ -175,14 +175,10 @@
 (define (make-interval a b) (cons a b))
 
 (define (upper-bound x)
-  (if (> (car x) (cdr x))
-      (car x)
-      (cdr x)))
+  (max (car x) (cdr x)))
 
 (define (lower-bound x)
-  (if (< (car x) (cdr x))
-      (car x)
-      (cdr x)))
+  (min (car x) (cdr x)))
 
 
 ;; Exercise 2.8
@@ -229,3 +225,48 @@
 (display (width int2))
 (newline)
 (display (width int_prod))
+
+
+;; Exercise 2.10
+
+(define (div-interval-improved x y)
+  (if (and (< (lower-bound y) 0) (> (upper-bound y) 0))
+    (error "Divisor interval spans 0")
+    (div-interval x y)))
+
+(display (div-interval int2 int1))
+(div-interval-improved int2 int1)
+
+
+;; Exercise 2.11
+
+(define (mul-interval-new x y)
+  (define (neg? x) (negative? x))
+  (define (pos? x) (not (negative? x)))
+
+  (let ((lx (lower-bound x))
+        (ux (upper-bound x))
+        (ly (lower-bound y))
+        (uy (upper-bound y)))
+
+    (cond ((and (pos? lx) (pos? ux))
+           (cond ((and (pos? ly) (pos? uy))
+                  (make-interval (* lx ly) (* ux uy)))
+                 ((and (neg? ly) (pos? uy))
+                  (make-interval (* ux ly) (* ux uy)))
+                 ((and (neg? ly) (neg? uy))
+                  (make-interval (* ux ly) (* lx uy)))))
+          ((and (neg? lx) (pos? ux))
+           (cond ((and (pos? ly) (pos? uy))
+                  (make-interval (* lx uy) (* ux uy)))
+                 ((and (neg? ly) (pos? uy))
+                  (mul-interval x y))
+                 ((and (neg? ly) (neg? uy))
+                  (make-interval (* ux ly) (* lx ly)))))
+          ((and (neg? lx) (neg? ux))
+           (cond ((and (pos? ly) (pos? uy))
+                  (make-interval (* lx uy) (* ux ly)))
+                 ((and (neg? ly) (pos? uy))
+                  (make-interval (* lx uy) (* lx ly)))
+                 ((and (neg? ly) (neg? uy))
+                  (make-interval (* ux uy) (* lx ly))))))))
