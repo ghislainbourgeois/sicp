@@ -289,3 +289,56 @@
 
 (define (percent i)
   (/ (width i) (center i)))
+
+
+;; Exercise 2.14
+
+(define (par1 r1 r2)
+  (div-interval (mul-interval r1 r2)
+                (add-interval r1 r2)))
+
+(define (par2 r1 r2)
+  (let ((one (make-interval 1 1)))
+    (div-interval
+      one (add-interval (div-interval one r1)
+                        (div-interval one r2)))))
+
+(define r1 (make-center-percent 5000 0.05))
+(define r2 (make-center-percent 100000 0.05))
+
+(newline)
+(display (par1 r1 r2))
+(newline)
+(display (par2 r1 r2))
+
+(define a (make-center-percent 100 0.01))
+(define b (make-center-percent 200 0.03))
+
+(define (test)
+  (define (disp-c-p int)
+    (display "(")
+    (display (center int))
+    (display ", ")
+    (display (percent int))
+    (display ")"))
+  (newline)
+  (disp-c-p (par1 r1 r2))
+  (newline)
+  (disp-c-p (par2 r1 r2))
+  (newline)
+  (disp-c-p (div-interval a a))
+  (newline)
+  (disp-c-p (div-interval a b)))
+
+
+;; Exercise 2.15
+;;
+;; She is right. The par1 program, by repeating the variables r1 and r2 in the
+;; computation, calculates additional intermediate values, each time adding
+;; the innacuracy of floating point calculations.
+
+
+;; Exercise 2.16
+;;
+;; As explained in the previous exercise, the calculation of intermediate
+;; values compounds the floating-point calculations innacuracies.
