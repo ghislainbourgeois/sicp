@@ -103,3 +103,157 @@
 (for-each (lambda (x) (newline)
             (display x))
           (list 57 321 88))
+
+
+;; Exercise 2.24
+;;
+;; (1 (2 (3 4)))
+;;
+;; [ 1 | V ]
+;;     [ 2 | V ]
+;;         [ 3 | 4 ]
+;;
+;;           (1 (2 (3 4)))
+;;                / \
+;;               /   \
+;;              1   (2 (3 4))
+;;                     / \
+;;                    /   \
+;;                   2   (3 4)
+;;                        / \
+;;                       /   \
+;;                      3     4
+
+
+;; Exercise 2.25
+;;
+
+(define x (list 1 3 (list 5 7) 9))
+
+(cdr (car (cdr (cdr x))))
+
+(define x (list (list 7)))
+
+(car (car x))
+
+(define x (list 1 (list 2 (list 3 (list 4 (list 5 (list 6 7)))))))
+
+(car (cdr (car (cdr (car (cdr (car (cdr (car (cdr (car (cdr x))))))))))))
+
+
+;; Exercise 2.26
+;;
+
+(define x (list 1 2 3))
+(define y (list 4 5 6))
+
+;; (append x y)
+;; (1 2 3 4 5 6)
+;;
+;; (cons x y)
+;; ((1 2 3) 4 5 6)
+;;
+;; (list x y)
+;; ((1 2 3) (4 5 6))
+
+
+;; Exercise 2.27
+;;
+
+(define x (list (list 1 2) (list 3 4)))
+
+(reverse x)
+
+(define (deep-reverse x)
+  (cond ((null? x) x)
+        ((not (pair? x)) x)
+        (else (append (deep-reverse (cdr x)) (cons (deep-reverse (car x)) '())))))
+
+(deep-reverse x)
+
+
+;; Exercise 2.28
+;;
+
+(define (fringe x)
+  (cond ((null? x) x)
+        ((not (pair? x)) (list x))
+        (else (append (fringe (car x)) (fringe (cdr x))))))
+
+(fringe x)
+(fringe (list x x))
+
+
+;; Exercise 2.29
+;;
+
+(define (make-mobile left right)
+  (list left right))
+
+(define (make-branch length structure)
+  (list length structure))
+
+(define (left-branch mobile)
+  (car mobile))
+
+(define (right-branch mobile)
+  (car (cdr mobile)))
+
+(define (branch-length branch)
+  (car branch))
+
+(define (branch-structure branch)
+  (car (cdr branch)))
+
+(define (mobile? mobile)
+  (and (pair? mobile) (pair? (left-branch mobile))))
+
+(define (branch? branch)
+  (and (pair? branch) (not (pair? (branch-length branch)))))
+
+(define (total-weight mobile)
+  (cond ((not (pair? mobile)) mobile)
+        ((not (mobile? mobile))
+         (cond ((not (mobile? (branch-structure mobile))) (branch-structure mobile))
+               (else (total-weight (branch-structure mobile)))))
+        (else (+ (total-weight (left-branch mobile)) (total-weight (right-branch mobile))))))
+
+(define mobile (make-mobile (make-branch 1 10) (make-branch 10 (make-mobile (make-branch 5 40) (make-branch 3 35)))))
+
+(total-weight mobile)
+
+(define (branch-torque branch)
+  (* (branch-length branch) (total-weight (branch-structure branch))))
+
+(define (balanced? mobile)
+  (cond ((not (mobile? mobile))
+         (cond ((not (mobile? (branch-structure mobile))) #t)
+               (else (balanced? (branch-structure mobile)))))
+        (else (and
+                (balanced? (left-branch mobile))
+                (balanced? (right-branch mobile))
+                (= (branch-torque (left-branch mobile))
+                   (branch-torque (right-branch mobile)))))))
+
+(balanced? mobile)
+
+(define mobile (make-mobile (make-branch 1 50) (make-branch 10 (make-mobile (make-branch 2 2.5) (make-branch 2 2.5)))))
+
+(balanced? mobile)
+
+;; The only changes required are to the right-branch and branch-structure accessors.
+
+(define (make-mobile left right)
+  (cons left right))
+
+(define (make-branch length structure)
+  (cons length structure))
+
+(define (right-branch mobile)
+  (cdr mobile))
+
+(define (branch-structure branch)
+  (cdr branch))
+
+(define mobile (make-mobile (make-branch 1 50) (make-branch 10 (make-mobile (make-branch 2 2.5) (make-branch 2 2.5)))))
+(balanced? mobile)
