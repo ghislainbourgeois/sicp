@@ -271,6 +271,7 @@
 
 (display expected)
 (display (square-tree input))
+(newline)
 
 (define (square-tree tree)
   (map (lambda (sub-tree)
@@ -281,3 +282,37 @@
 
 (display expected)
 (display (square-tree input))
+(newline)
+
+;; Exercise 2.31
+
+(define (tree-map f tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (tree-map f sub-tree)
+             (f sub-tree)))
+       tree))
+
+(define (square-tree tree) (tree-map square tree))
+
+(display expected)
+(display (square-tree input))
+(newline)
+
+
+;; Exercise 2.32
+;;
+;; The following solution works because it takes the subsets of the current set
+;; without the first element and adds the first element to all the subsets. It
+;; then appends the original subsets to this new set of subsets.
+
+
+(define (subsets s)
+  (if (null? s)
+      (list `())
+      (let ((rest (subsets (cdr s))))
+        (append rest (map (lambda (item)
+                            (append (list (car s)) item)) rest)))))
+
+(display (subsets (list 1 2 3)))
+(newline)
