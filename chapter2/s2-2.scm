@@ -257,3 +257,27 @@
 
 (define mobile (make-mobile (make-branch 1 50) (make-branch 10 (make-mobile (make-branch 2 2.5) (make-branch 2 2.5)))))
 (balanced? mobile)
+
+;; Exercise 2.30
+
+(define input (list 1 (list 2 (list 3 4) 5) (list 6 7)))
+(define expected (list 1 (list 4 (list 9 16) 25) (list 36 49)))
+
+(define (square-tree tree)
+  (cond ((null? tree) tree)
+        ((not (pair? tree)) (square tree))
+        (else (cons (square-tree (car tree))
+                    (square-tree (cdr tree))))))
+
+(display expected)
+(display (square-tree input))
+
+(define (square-tree tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (square-tree sub-tree)
+             (square sub-tree)))
+         tree))
+
+(display expected)
+(display (square-tree input))
