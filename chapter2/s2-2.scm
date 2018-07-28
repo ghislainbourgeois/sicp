@@ -431,3 +431,41 @@
 (display expected)
 (display (matrix-*-matrix m n))
 (newline)
+
+;; Exercise 2.38
+
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+
+(define fold-right accumulate)
+
+(display (fold-right / 1 (list 1 2 3)))
+(display (fold-left / 1 (list 1 2 3)))
+(display (fold-right list '() (list 1 2 3)))
+(display (fold-left list '() (list 1 2 3)))
+(display (fold-right + 0 (list 1 2 3)))
+(display (fold-left + 0 (list 1 2 3)))
+(display (fold-right * 1 (list 1 2 3)))
+(display (fold-left * 1 (list 1 2 3)))
+(newline)
+
+;; The operation needs to be commutative
+
+;; Exercise 2.39
+
+(define (reverse sequence)
+  (fold-right (lambda (x y) (append y (list x))) nil sequence))
+
+(display (reverse (list 1 2 3)))
+(newline)
+
+(define (reverse sequence)
+  (fold-left (lambda (x y) (append (list y) x)) nil sequence))
+
+(display (reverse (list 1 2 3)))
+(newline)
