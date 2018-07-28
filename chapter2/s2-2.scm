@@ -316,3 +316,118 @@
 
 (display (subsets (list 1 2 3)))
 (newline)
+
+
+;; Exercise 2.33
+
+(define nil '())
+
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op initial (cdr sequence)))))
+
+(define (map p sequence)
+  (accumulate (lambda (x y) (append (list (p x)) y)) nil sequence))
+
+(display (map square (list 1 2 3)))
+(newline)
+
+(define (append seq1 seq2)
+  (accumulate cons seq2 seq1))
+
+(display (append (list 1 2) (list 3 4)))
+(newline)
+
+(define (inc x y)
+  (+ 1 y))
+
+(define (length sequence)
+  (accumulate inc 0 sequence))
+
+(display (length (list 1 2 3)))
+(newline)
+
+;; Exercise 2.34
+
+(define (horner-eval x coefficient-sequence)
+  (accumulate (lambda (this-coeff higher-terms)
+                      (+ this-coeff (* x higher-terms)))
+              0
+              coefficient-sequence))
+
+(define coefficients (list 1 2 3))
+(define x 4)
+
+;; 3 * 4^2 + 2 * 4 + 1
+;; 3 * 16 + 2 * 4 + 1
+;; 48 + 8 + 1
+;; 48 + 8 + 1
+;; 57
+
+(display 57)
+(display (horner-eval x coefficients))
+(newline)
+
+(display 79)
+(display (horner-eval 2 (list 1 3 0 5 0 1)))
+(newline)
+
+;; Exercise 2.35
+
+(define (enumerate-tree tree)
+  (cond ((null? tree) nil)
+        ((not (pair? tree)) (list tree))
+        (else (append (enumerate-tree (car tree))
+                      (enumerate-tree (cdr tree))))))
+
+(define (count-leaves t)
+  (accumulate +
+              0
+              (map (lambda (i) 1) (enumerate-tree t))))
+
+(display 7)
+(display (count-leaves input))
+(newline)
+
+;; Exercise 2.36
+
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      nil
+      (cons (accumulate op init (map car seqs))
+            (accumulate-n op init (map cdr seqs)))))
+
+(define s (list (list 1 2 3) (list 4 5 6) (list 7 8 9) (list 10 11 12)))
+
+(display (list 22 26 30))
+(display (accumulate-n + 0 s))
+(newline)
+
+;; Exercise 2.37
+
+(define vector (list 2 1 3))
+(define matrix (list (list 1 2 3) (list 4 5 6) (list 7 8 9)))
+
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+
+(define (matrix-*-vector m v)
+  (map (lambda (row) (dot-product v row)) m))
+
+(define (transpose mat)
+  (accumulate-n cons nil mat))
+
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map (lambda (row) (matrix-*-vector cols row)) m)))
+
+(define m (list (list -2 0 -1) (list 4 -4 1) (list 2 3 5)))
+(define n (list (list 6 7 -1) (list -3 8 -4) (list 4 2 5)))
+
+(define expected (list (list -16 -16 -3) (list 40 -2 17) (list 23 48 11)))
+
+(display expected)
+(display (matrix-*-matrix m n))
+(newline)
