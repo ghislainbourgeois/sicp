@@ -1,4 +1,3 @@
-(RESTART 1)
 ;; Exercise 2.17
 
 (define (last-pair x)
@@ -328,11 +327,15 @@
       (op (car sequence)
           (accumulate op initial (cdr sequence)))))
 
+(define oldmap map)
+
 (define (map p sequence)
   (accumulate (lambda (x y) (append (list (p x)) y)) nil sequence))
 
 (display (map square (list 1 2 3)))
 (newline)
+
+(define oldappend append)
 
 (define (append seq1 seq2)
   (accumulate cons seq2 seq1))
@@ -343,11 +346,17 @@
 (define (inc x y)
   (+ 1 y))
 
+(define oldlength length)
+
 (define (length sequence)
   (accumulate inc 0 sequence))
 
 (display (length (list 1 2 3)))
 (newline)
+
+(define map oldmap)
+(define append oldappend)
+(define length oldlength)
 
 ;; Exercise 2.34
 
@@ -469,3 +478,29 @@
 
 (display (reverse (list 1 2 3)))
 (newline)
+
+;; Exercise 2.40
+
+(define (flatmap proc seq)
+  (accumulate append nil (map proc seq)))
+
+(define (enumerate-interval a b)
+  (cond ((> a b) '())
+        ((= a b) (list b))
+        (else (append (list a) (enumerate-interval (+ a 1) b)))))
+
+(define (unique-pairs n)
+  (flatmap (lambda (i)
+             (map (lambda (j) (list i j))
+                  (enumerate-interval 1 (- i 1))))
+           (enumerate-interval 1 n)))
+
+(display (unique-pairs 3))
+(newline)
+
+(define (make-pair-sum pair)
+  (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
+
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter prime-sum? (unique-pairs n))))
